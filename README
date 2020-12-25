@@ -1,0 +1,7 @@
+simple text-based status command for sway/i3/anything else with a bar.
+
+doesn't depend on anything other than standard c stuff
+
+you will probably have to change the sysfs paths for your specific system, as they tend to be nonportable
+
+just run `make` then set your bar status_command in window manager config to `/path/to/peri_status`
