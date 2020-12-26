@@ -15,7 +15,7 @@ unsigned long get_disk_free(const char *path) {
 
 /* reduce the bytes into readable form. depending on how many reductions are necessary,
  change the unit label at the end. then write to the given string */
-void create_disk_str(unsigned long free_bytes, char *buf) {
+void create_size_str(unsigned long free_bytes, char *buf) {
         int reductions = 0;
         char unit;
         long double ret = free_bytes;
@@ -43,5 +43,6 @@ void create_disk_str(unsigned long free_bytes, char *buf) {
                         unit = ' ';
                         break;
         }
-        snprintf(buf, 7, "%.2Lf%c", ret, unit);
+        int size = sizeof(buf);
+        snprintf(buf, size, "%.2Lf%c", ret, unit);
 }
