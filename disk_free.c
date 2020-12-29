@@ -40,7 +40,7 @@ void create_size_str(unsigned long free_bytes, char *buf) {
                         unit = 'T';
                         break;
                 default:
-                        unit = ' ';
+                        unit = 'q';
                         break;
         }
         int size = sizeof(buf);
