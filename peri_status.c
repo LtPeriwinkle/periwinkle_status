@@ -6,14 +6,17 @@
 #include "disk_free.h"
 
 int main(int argc, char* argv[]) {
-        struct sysinfo si;
         struct tm *dt;
         time_t rawtime;
         char gpu_pct[3];
         char diskinfo[7];
         char meminfo[10];
+        char line[28];
         int cpu_temp;
         int gpu_temp;
+        int line_index;
+        int avail_kb = 0;
+        int total_kb = 0;
         unsigned long int free_bytes;
         char datetime[20];
         int num = 0;
@@ -23,6 +26,8 @@ int main(int argc, char* argv[]) {
         FILE *cput = fopen("/sys/class/hwmon/hwmon1/temp2_input", "r");
         // gpu percent file
         FILE *gpup = fopen("/sys/class/drm/card0/device/gpu_busy_percent", "r");
+        // memory stuff
+        FILE *memfile = fopen("/proc/meminfo", "r");
         while (1) {
                 // only check the disk on the first time and afer num is reset
                 if (num == 0) {
@@ -44,9 +49,19 @@ int main(int argc, char* argv[]) {
                 gpu_temp /= 1000;
 
 		// get memory info using sysinfo. will eventually get and format system uptime here
-		sysinfo(&si);
-		free_bytes = (si.totalram * si.mem_unit) - (si.freeram * si.mem_unit);
-		create_size_str(free_bytes, meminfo);
+		line_index = 0;
+		while (fgets(line, sizeof(line), memfile)) {
+    			sscanf(line, "MemAvailable %*s %d %*s", &avail_kb);
+			sscanf(line, "MemTotal %*s %d %*s", &total_kb);
+			line_index += 1;
+			if (line_index == 6) {break;}
+    		}
+    		free_bytes = total_kb - avail_kb;
+    		rewind(memfile);
+    		fflush(memfile);
+/*		sysinfo(&si);
+		free_bytes = ((si.totalram * si.mem_unit) + (si.sharedram * si.mem_unit)) - ((si.freeram * si.mem_unit) + (si.bufferram * si.mem_unit));
+*/		create_size_str(free_bytes * 1024, meminfo);
 
 		// hopefully fix time stuff
                 rawtime = time(NULL);
